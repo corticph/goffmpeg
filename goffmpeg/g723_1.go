@@ -54,7 +54,7 @@ func NewG7231Decoder() *G7231Decoder {
 }
 
 // Decode will decode all of the input packets
-func (decoder *G7231Decoder) Decode(input []byte) ([]byte, error) {
+func (decoder *G7231Decoder) Decode(input []byte) []byte {
 	data := unsafe.Pointer(&input[0])
 
 	ptrindex := 0
@@ -90,7 +90,7 @@ func (decoder *G7231Decoder) Decode(input []byte) ([]byte, error) {
 		dataSize -= int(ret)
 		data = unsafe.Pointer(&input[ptrindex])
 	}
-	return buf.Bytes(), nil
+	return buf.Bytes()
 }
 
 // Destroy will free all of the memory allocated by the decoder
