@@ -81,6 +81,7 @@ func (decoder *G7231Decoder) Decode(input []byte) []byte {
 			break
 		}
 		buf.Write(C.GoBytes(unsafe.Pointer(result), resultSize))
+		C.free(unsafe.Pointer(result))
 
 		if ptrindex+int(ret) > len(input)-1 {
 			break
