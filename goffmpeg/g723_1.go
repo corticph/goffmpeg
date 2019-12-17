@@ -14,6 +14,15 @@ import (
 	"unsafe"
 )
 
+// Decoder is an interface borrowed from the `cart` project
+type Decoder interface {
+	Decode([]byte) ([]byte, error)
+	Destroy()
+	ConsumesPayloadType(int) bool
+}
+
+var _ Decoder = &G7231Decoder{}
+
 // G7231Decoder is a struct for decoding g723.1 packets
 type G7231Decoder struct {
 	pkt          *C.struct_AVPacket
@@ -53,8 +62,15 @@ func NewG7231Decoder() *G7231Decoder {
 	}
 }
 
+// ConsumesPayloadType will return whether or not the given decoder
+// consumes the payload type (specified in the RTP payload type RFC 3550)
+// https://en.wikipedia.org/wiki/RTP_payload_formats
+func (decoder *G7231Decoder) ConsumesPayloadType(plt int) bool {
+	return plt == 4
+}
+
 // Decode will decode all of the input packets
-func (decoder *G7231Decoder) Decode(input []byte) []byte {
+func (decoder *G7231Decoder) Decode(input []byte) ([]byte, error) {
 	data := unsafe.Pointer(&input[0])
 
 	ptrindex := 0
@@ -91,7 +107,7 @@ func (decoder *G7231Decoder) Decode(input []byte) []byte {
 		dataSize -= int(ret)
 		data = unsafe.Pointer(&input[ptrindex])
 	}
-	return buf.Bytes()
+	return buf.Bytes(), nil
 }
 
 // Destroy will free all of the memory allocated by the decoder
