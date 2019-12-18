@@ -14,5 +14,6 @@
 audio/
 goffmpeg/lib*
 goffmpeg/.vscode
+goffmpeg/.DS_Store
 .vscode/
 .DS_Store
