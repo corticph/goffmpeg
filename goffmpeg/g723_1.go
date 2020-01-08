@@ -1,4 +1,4 @@
-package goffmpeg
+package main
 
 // #cgo CFLAGS: -I./include
 // #cgo LDFLAGS: -L lib -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lffmpeg -lswresample -lswscale
@@ -32,8 +32,8 @@ type G7231Decoder struct {
 	decodedFrame *C.struct_AVFrame
 }
 
-// NewG7231Decoder will return a new g723.1 decoder
-func NewG7231Decoder() *G7231Decoder {
+// New will return a new g723.1 decoder
+func New() (interface{}, error) {
 	pkt := C.av_packet_alloc()
 	codec := C.avcodec_find_decoder(C.AV_CODEC_ID_G723_1)
 	if codec == nil {
@@ -59,7 +59,7 @@ func NewG7231Decoder() *G7231Decoder {
 		parser:       parser,
 		c:            c,
 		decodedFrame: decodedFrame,
-	}
+	}, nil
 }
 
 // ConsumesPayloadType will return whether or not the given decoder
