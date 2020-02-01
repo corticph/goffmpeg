@@ -17,7 +17,11 @@ func main() {
 	}
 	decoder := goffmpeg.NewG7231Decoder()
 	defer decoder.Destroy()
-	data := decoder.Decode(infile)
+	data, err := decoder.Decode(infile)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	if err := ioutil.WriteFile("outfile.wav", data, 0755); err != nil {
 		panic(err)
