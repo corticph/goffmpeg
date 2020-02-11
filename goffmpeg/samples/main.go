@@ -15,7 +15,17 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	decoder := goffmpeg.NewG7231Decoder()
+	d, err := goffmpeg.New()
+	if err != nil {
+		panic(err)
+	}
+
+	decoder, ok := d.(goffmpeg.Decoder)
+
+	if !ok {
+		panic("oh no")
+	}
+
 	defer decoder.Destroy()
 	data, err := decoder.Decode(infile)
 	if err != nil {
