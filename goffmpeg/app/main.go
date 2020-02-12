@@ -2,9 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github/corticph/g72x/goffmpeg/goporting"
 	"io/ioutil"
-
-	"github.com/corticph/g72x/goffmpeg"
 )
 
 // This small sample will decode a g723.1 audio file and output a raw PCM
@@ -15,12 +14,12 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	d, err := goffmpeg.New()
+	d, err := goporting.New()
 	if err != nil {
 		panic(err)
 	}
 
-	decoder, ok := d.(goffmpeg.Decoder)
+	decoder, ok := d.(goporting.Decoder)
 
 	if !ok {
 		panic("oh no")
