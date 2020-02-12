@@ -35,7 +35,7 @@ type G7231Decoder struct {
 // New will return a new g723.1 decoder
 func New() (interface{}, error) {
 	pkt := C.av_packet_alloc()
-	codec := C.avcodec_find_decoder(C.AV_CODEC_ID_G723_1)
+	codec := C.avcodec_find_decoder(C.AV_CODEC_ID_G729)
 	if codec == nil {
 		log.Fatal("Codec not found")
 	}
@@ -93,7 +93,9 @@ func (decoder *G7231Decoder) Decode(input []byte) ([]byte, error) {
 			&resultSize,
 		)
 
-		if ret < 0 {
+		// if this is 0, which means a flush packet in which case it will break out of the loop
+		// if it is negative, it signals an error.
+		if ret <= 0 {
 			break
 		}
 		buf.Write(C.GoBytes(unsafe.Pointer(result), resultSize))
