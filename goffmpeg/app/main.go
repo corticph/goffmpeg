@@ -25,7 +25,7 @@ func main() {
 	pflag.StringP("input", "i", "", "The path of the file to decode")
 	pflag.StringP("output", "o", "", "The path where to save the decoded file")
 	pflag.Parse()
-	bindeViperFlags()
+	bindViperFlags()
 
 	input := readFile(viper.GetString("input"))
 	decoder := getDecoder(viper.GetString("codec"))
@@ -33,7 +33,7 @@ func main() {
 
 	result := decode(decoder, input)
 	writeFile(result, viper.GetString("output"))
-	fmt.Printf("%v was written to disk (%d bytes)\n", len(result), viper.GetString("output"))
+	fmt.Printf("%v was written to disk (%d bytes)\n", viper.GetString("output"), len(result))
 }
 
 func decode(decoder goporting.Decoder, input []byte) []byte {
@@ -46,7 +46,7 @@ func decode(decoder goporting.Decoder, input []byte) []byte {
 	return result
 }
 
-func bindeViperFlags() {
+func bindViperFlags() {
 
 	if err := viper.BindPFlags(pflag.CommandLine); err != nil {
 		panic(err)
