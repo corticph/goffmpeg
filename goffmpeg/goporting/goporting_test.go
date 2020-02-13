@@ -18,9 +18,11 @@ const (
 )
 
 func TestDecodeG729(t *testing.T) {
-
 	assertDecode(t, G729, G729InFilePath, G729OutFilePath)
+}
 
+func TestDecodeG723(t *testing.T) {
+	assertDecode(t, G723, G723InFilePath, G723OutFilePath)
 }
 
 func assertDecode(t *testing.T, codec Codec, inputFile, expectedFilePath string) {

@@ -10,11 +10,11 @@ import (
 // audio file. This file can be played with the following ffmpeg command:
 // ffplay -f s16le -ar 8k -ac 1 outfile.wav
 func main() {
-	infile, err := ioutil.ReadFile("../goporting/testfiles/G729.raw")
+	infile, err := ioutil.ReadFile("../goporting/testfiles/G723.raw")
 	if err != nil {
 		panic(err)
 	}
-	d, err := goporting.New()
+	d, err := goporting.New(goporting.G723)
 	if err != nil {
 		panic(err)
 	}

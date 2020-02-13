@@ -18,6 +18,7 @@ type Codec C.enum_AVCodecID
 
 var (
 	G729 Codec = C.AV_CODEC_ID_G729
+	G723 Codec = C.AV_CODEC_ID_G723_1
 )
 
 // Decoder is an interface borrowed from the `cart` project
