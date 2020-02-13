@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github/corticph/g72x/goffmpeg/goporting"
+	"github/corticph/g72x/goffmpeg"
 	"io/ioutil"
 
 	"github.com/spf13/pflag"
@@ -10,9 +10,9 @@ import (
 )
 
 var (
-	codecs = map[string]goporting.Codec{
-		"G729": goporting.G729,
-		"G723": goporting.G723,
+	codecs = map[string]goffmpeg.Codec{
+		"G729": goffmpeg.G729,
+		"G723": goffmpeg.G723,
 	}
 )
 
@@ -36,7 +36,7 @@ func main() {
 	fmt.Printf("%v was written to disk (%d bytes)\n", viper.GetString("output"), len(result))
 }
 
-func decode(decoder goporting.Decoder, input []byte) []byte {
+func decode(decoder goffmpeg.Decoder, input []byte) []byte {
 
 	result, err := decoder.Decode(input)
 	if err != nil {
@@ -53,14 +53,14 @@ func bindViperFlags() {
 	}
 }
 
-func getDecoder(codec string) goporting.Decoder {
+func getDecoder(codec string) goffmpeg.Decoder {
 
-	d, err := goporting.NewFFMPEGDecoder(codecs[codec])
+	d, err := goffmpeg.NewFFMPEGDecoder(codecs[codec])
 	if err != nil {
 		panic(err)
 	}
 
-	decoder, ok := d.(goporting.Decoder)
+	decoder, ok := d.(goffmpeg.Decoder)
 
 	if !ok {
 		panic("could not cast decoder")

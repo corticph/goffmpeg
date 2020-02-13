@@ -1,4 +1,4 @@
-package goporting
+package goffmpeg
 
 import (
 	"bytes"

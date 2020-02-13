@@ -1,4 +1,4 @@
-package goporting
+package goffmpeg
 
 // #cgo CFLAGS: -I./include
 // #cgo LDFLAGS: -L cffmpeg -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lffmpeg -lswresample -lswscale
