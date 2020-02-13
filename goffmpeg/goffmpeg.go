@@ -6,7 +6,7 @@ package goffmpeg
 // #include <stdlib.h>
 // #include <string.h>
 // #include "libavcodec/avcodec.h"
-// #include "include/g723_1_decode.h"
+// #include "include/decoder.h"
 import "C"
 import (
 	"bytes"
