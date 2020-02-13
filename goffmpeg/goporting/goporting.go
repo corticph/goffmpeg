@@ -40,33 +40,60 @@ type G7231Decoder struct {
 }
 
 // New will return a new g723.1 decoder
-func New(codecName Codec) (interface{}, error) {
+func New(codecType Codec) (interface{}, error) {
 	pkt := C.av_packet_alloc()
-	codec := C.avcodec_find_decoder(uint32(codecName))
-	if codec == nil {
-		log.Fatal("Codec not found")
-	}
-	parser := C.av_parser_init(C.int(codec.id))
-	if parser == nil {
-		log.Fatal("Parser not found")
-	}
-	c := C.avcodec_alloc_context3(codec)
-	if c == nil {
-		log.Fatal("Could not allocate audio codec context")
-	}
-	c.channels = 1
-	if C.avcodec_open2(c, codec, nil) < 0 {
-		log.Fatal("Could not open codec")
-	}
+	codec := getCodec(codecType)
+	parser := getParser(C.int(codec.id))
+	context := getContext(codec)
 	decodedFrame := C.av_frame_alloc()
 
 	return &G7231Decoder{
 		pkt:          pkt,
 		codec:        codec,
 		parser:       parser,
-		c:            c,
+		c:            context,
 		decodedFrame: decodedFrame,
 	}, nil
+}
+
+func getCodec(codecType Codec) *C.struct_AVCodec {
+
+	c := C.avcodec_find_decoder(uint32(codecType))
+	if c == nil {
+		log.Fatal("Codec not found")
+	}
+	return c
+
+}
+
+func getParser(id C.int) *C.struct_AVCodecParserContext {
+
+	parser := C.av_parser_init(id)
+	if parser == nil {
+		log.Fatal("Parser not found")
+	}
+
+	return parser
+
+}
+
+func getContext(codec *C.struct_AVCodec) *C.struct_AVCodecContext {
+
+	context := C.avcodec_alloc_context3(codec)
+	if context == nil {
+		log.Fatal("Could not allocate audio codec context")
+	}
+
+	context.channels = 1
+	openContext(context, codec)
+	return context
+
+}
+
+func openContext(context *C.struct_AVCodecContext, codec *C.struct_AVCodec) {
+	if C.avcodec_open2(context, codec, nil) < 0 {
+		log.Fatal("Could not open codec")
+	}
 }
 
 // ConsumesPayloadType will return whether or not the given decoder
