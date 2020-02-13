@@ -13,9 +13,19 @@ const (
 	tmpFileName     = "tmpfile"
 	G729InFilePath  = "testfiles/G729.raw"
 	G729OutFilePath = "testfiles/G729.wav"
+	G723InFilePath  = "testfiles/G723.raw"
+	G723OutFilePath = "testfiles/G723.wav"
 )
 
 func TestDecodeG729(t *testing.T) {
+
+	assertDecode(t, G729InFilePath, G729OutFilePath)
+
+}
+
+func assertDecode(t *testing.T, inputFile, expectedFilePath string) {
+
+	t.Helper()
 
 	tmpDir := createTmpDir(t, tmpDirPrefix)
 	defer os.RemoveAll(tmpDir)
@@ -24,13 +34,13 @@ func TestDecodeG729(t *testing.T) {
 	decoder := getDecoder(t)
 	defer decoder.Destroy()
 
-	byteStream := readFile(t, G729InFilePath)
+	byteStream := readFile(t, inputFile)
 	data := decodeData(t, decoder, byteStream)
 
 	writeFile(t, tmpFilePath, data)
 	writtenFile := readFile(t, tmpFilePath)
 
-	expectedOutput := readFile(t, G729OutFilePath)
+	expectedOutput := readFile(t, expectedFilePath)
 
 	assertFilesEqual(t, writtenFile, expectedOutput)
 }
