@@ -19,11 +19,11 @@ const (
 
 func TestDecodeG729(t *testing.T) {
 
-	assertDecode(t, G729InFilePath, G729OutFilePath)
+	assertDecode(t, G729, G729InFilePath, G729OutFilePath)
 
 }
 
-func assertDecode(t *testing.T, inputFile, expectedFilePath string) {
+func assertDecode(t *testing.T, codec Codec, inputFile, expectedFilePath string) {
 
 	t.Helper()
 
@@ -31,7 +31,7 @@ func assertDecode(t *testing.T, inputFile, expectedFilePath string) {
 	defer os.RemoveAll(tmpDir)
 	tmpFilePath := filepath.Join(tmpDir, tmpFileName)
 
-	decoder := getDecoder(t)
+	decoder := getDecoder(t, codec)
 	defer decoder.Destroy()
 
 	byteStream := readFile(t, inputFile)
@@ -71,11 +71,11 @@ func createTmpDir(t *testing.T, prefix string) string {
 
 }
 
-func getDecoder(t *testing.T) Decoder {
+func getDecoder(t *testing.T, codec Codec) Decoder {
 
 	t.Helper()
 
-	d, err := New()
+	d, err := New(codec)
 	if err != nil {
 		t.Error(err)
 	}

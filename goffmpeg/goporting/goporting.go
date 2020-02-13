@@ -14,6 +14,12 @@ import (
 	"unsafe"
 )
 
+type Codec C.enum_AVCodecID
+
+var (
+	G729 Codec = C.AV_CODEC_ID_G729
+)
+
 // Decoder is an interface borrowed from the `cart` project
 type Decoder interface {
 	Decode([]byte) ([]byte, error)
@@ -33,9 +39,9 @@ type G7231Decoder struct {
 }
 
 // New will return a new g723.1 decoder
-func New() (interface{}, error) {
+func New(codecName Codec) (interface{}, error) {
 	pkt := C.av_packet_alloc()
-	codec := C.avcodec_find_decoder(C.AV_CODEC_ID_G729)
+	codec := C.avcodec_find_decoder(uint32(codecName))
 	if codec == nil {
 		log.Fatal("Codec not found")
 	}
