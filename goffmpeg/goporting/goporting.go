@@ -28,14 +28,14 @@ type Decoder interface {
 	ConsumesPayloadType(int) bool
 }
 
-var _ Decoder = &G7231Decoder{}
+var _ Decoder = &FFMPEGDecoder{}
 
-// G7231Decoder is a struct for decoding g723.1 packets
-type G7231Decoder struct {
+// FFMPEGDecoder is a struct for decoding g723.1 packets
+type FFMPEGDecoder struct {
 	pkt          *C.struct_AVPacket
 	codec        *C.struct_AVCodec
 	parser       *C.struct_AVCodecParserContext
-	c            *C.struct_AVCodecContext
+	context      *C.struct_AVCodecContext
 	decodedFrame *C.struct_AVFrame
 }
 
@@ -47,11 +47,11 @@ func New(codecType Codec) (interface{}, error) {
 	context := getContext(codec)
 	decodedFrame := C.av_frame_alloc()
 
-	return &G7231Decoder{
+	return &FFMPEGDecoder{
 		pkt:          pkt,
 		codec:        codec,
 		parser:       parser,
-		c:            context,
+		context:      context,
 		decodedFrame: decodedFrame,
 	}, nil
 }
@@ -99,12 +99,12 @@ func openContext(context *C.struct_AVCodecContext, codec *C.struct_AVCodec) {
 // ConsumesPayloadType will return whether or not the given decoder
 // consumes the payload type (specified in the RTP payload type RFC 3550)
 // https://en.wikipedia.org/wiki/RTP_payload_formats
-func (decoder *G7231Decoder) ConsumesPayloadType(plt int) bool {
+func (decoder *FFMPEGDecoder) ConsumesPayloadType(plt int) bool {
 	return plt == 4
 }
 
 // Decode will decode all of the input packets
-func (decoder *G7231Decoder) Decode(input []byte) ([]byte, error) {
+func (decoder *FFMPEGDecoder) Decode(input []byte) ([]byte, error) {
 	data := unsafe.Pointer(&input[0])
 
 	ptrindex := 0
@@ -119,7 +119,7 @@ func (decoder *G7231Decoder) Decode(input []byte) ([]byte, error) {
 			decoder.pkt,
 			decoder.codec,
 			decoder.parser,
-			decoder.c,
+			decoder.context,
 			decoder.decodedFrame,
 			(*C.uchar)(data),
 			(C.ulong)(dataSize),
@@ -147,8 +147,8 @@ func (decoder *G7231Decoder) Decode(input []byte) ([]byte, error) {
 }
 
 // Destroy will free all of the memory allocated by the decoder
-func (decoder *G7231Decoder) Destroy() {
-	C.avcodec_free_context(&decoder.c)
+func (decoder *FFMPEGDecoder) Destroy() {
+	C.avcodec_free_context(&decoder.context)
 	C.av_parser_close(decoder.parser)
 	C.av_packet_free(&decoder.pkt)
 }
