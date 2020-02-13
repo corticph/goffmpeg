@@ -10,6 +10,7 @@ package goporting
 import "C"
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"unsafe"
 )
@@ -105,45 +106,58 @@ func (decoder *FFMPEGDecoder) ConsumesPayloadType(plt int) bool {
 
 // Decode will decode all of the input packets
 func (decoder *FFMPEGDecoder) Decode(input []byte) ([]byte, error) {
-	data := unsafe.Pointer(&input[0])
 
-	ptrindex := 0
-	dataSize := len(input) - 1
-
+	firstIndex := 0
+	lastIndex := len(input) - 1
 	var result *C.uchar
 	resultSize := C.int(0)
 	buf := &bytes.Buffer{}
 
-	for dataSize > 0 {
-		ret := C.decode_frame(
+	for lastIndex > 0 {
+		data := unsafe.Pointer(&input[firstIndex])
+		bytesProcessed := C.decode_frame(
 			decoder.pkt,
 			decoder.codec,
 			decoder.parser,
 			decoder.context,
 			decoder.decodedFrame,
 			(*C.uchar)(data),
-			(C.ulong)(dataSize),
+			(C.ulong)(lastIndex),
 			&result,
 			&resultSize,
 		)
 
-		// if this is 0, which means a flush packet in which case it will break out of the loop
-		// if it is negative, it signals an error.
-		if ret <= 0 {
+		if isFlushPackage(bytesProcessed) {
 			break
 		}
-		buf.Write(C.GoBytes(unsafe.Pointer(result), resultSize))
+
+		if isDecodeError(bytesProcessed) {
+			C.free(unsafe.Pointer(result))
+			return []byte(""), fmt.Errorf("error while decoding frame in byte number %d (0 indexed)", firstIndex)
+
+		}
+
+		appendToBuffer(result, buf, resultSize)
 		C.free(unsafe.Pointer(result))
 
-		if ptrindex+int(ret) > len(input)-1 {
-			break
-		}
-
-		ptrindex += int(ret)
-		dataSize -= int(ret)
-		data = unsafe.Pointer(&input[ptrindex])
+		firstIndex += int(bytesProcessed)
+		lastIndex -= int(bytesProcessed)
 	}
 	return buf.Bytes(), nil
+}
+
+func isFlushPackage(n C.int) bool {
+	return n == 0
+}
+
+func isDecodeError(n C.int) bool {
+	return n < 0
+}
+
+func appendToBuffer(data *C.uchar, buf *bytes.Buffer, size C.int) {
+
+	dataBytes := C.GoBytes(unsafe.Pointer(data), size)
+	buf.Write(dataBytes)
 }
 
 // Destroy will free all of the memory allocated by the decoder
