@@ -41,7 +41,7 @@ type FFMPEGDecoder struct {
 }
 
 // New will return a new g723.1 decoder
-func New(codecType Codec) (interface{}, error) {
+func NewFFMPEGDecoder(codecType Codec) (interface{}, error) {
 	pkt := C.av_packet_alloc()
 	codec := getCodec(codecType)
 	parser := getParser(C.int(codec.id))

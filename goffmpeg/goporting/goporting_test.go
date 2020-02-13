@@ -77,7 +77,7 @@ func getDecoder(t *testing.T, codec Codec) Decoder {
 
 	t.Helper()
 
-	d, err := New(codec)
+	d, err := NewFFMPEGDecoder(codec)
 	if err != nil {
 		t.Error(err)
 	}

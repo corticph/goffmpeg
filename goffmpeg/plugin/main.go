@@ -1,7 +1,11 @@
 package main
 
 import (
-	"github.com/corticph/g72x/goffmpeg"
+	"github.com/corticph/g72x/goffmpeg/goporting"
 )
 
-var New = goffmpeg.New
+var NewFFMPEGDecoder = goporting.NewFFMPEGDecoder
+
+func main() {
+
+}
