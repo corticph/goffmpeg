@@ -24,18 +24,38 @@ func main() {
 	pflag.StringP("codec", "c", "", "The name of the codec to use")
 	pflag.StringP("input", "i", "", "The path of the file to decode")
 	pflag.StringP("output", "o", "", "The path where to save the decoded file")
-
 	pflag.Parse()
+	bindeViperFlags()
+
+	input := readFile(viper.GetString("input"))
+	decoder := getDecoder(viper.GetString("codec"))
+	defer decoder.Destroy()
+
+	result := decode(decoder, input)
+	writeFile(result, viper.GetString("output"))
+	fmt.Printf("%v was written to disk (%d bytes)\n", len(result), viper.GetString("output"))
+}
+
+func decode(decoder goporting.Decoder, input []byte) []byte {
+
+	result, err := decoder.Decode(input)
+	if err != nil {
+		panic(err)
+	}
+
+	return result
+}
+
+func bindeViperFlags() {
 
 	if err := viper.BindPFlags(pflag.CommandLine); err != nil {
 		panic(err)
 	}
+}
 
-	infile, err := ioutil.ReadFile(viper.GetString("input"))
-	if err != nil {
-		panic(err)
-	}
-	d, err := goporting.NewFFMPEGDecoder(codecs[viper.GetString("codec")])
+func getDecoder(codec string) goporting.Decoder {
+
+	d, err := goporting.NewFFMPEGDecoder(codecs[codec])
 	if err != nil {
 		panic(err)
 	}
@@ -43,23 +63,25 @@ func main() {
 	decoder, ok := d.(goporting.Decoder)
 
 	if !ok {
-		panic("oh no")
+		panic("could not cast decoder")
 	}
 
-	defer decoder.Destroy()
-	data, err := decoder.Decode(infile)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	return decoder
 
-	if err := ioutil.WriteFile(viper.GetString("output"), data, 0755); err != nil {
+}
+
+func writeFile(data []byte, path string) {
+
+	if err := ioutil.WriteFile(path, data, 0755); err != nil {
 		panic(err)
 	}
+}
 
-	ofile, err := ioutil.ReadFile(viper.GetString("output"))
+func readFile(path string) []byte {
+
+	data, err := ioutil.ReadFile(path)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("file was written to disk (%d bytes)\n", len(ofile))
+	return data
 }
