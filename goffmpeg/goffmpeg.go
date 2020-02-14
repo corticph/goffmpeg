@@ -22,6 +22,8 @@ var (
 	G723 Codec = C.AV_CODEC_ID_G723_1
 )
 
+const G729RTPPayloadType = 18
+
 // Decoder is an interface borrowed from the `cart` project
 type Decoder interface {
 	Decode([]byte) ([]byte, error)
@@ -101,7 +103,7 @@ func openContext(context *C.struct_AVCodecContext, codec *C.struct_AVCodec) {
 // consumes the payload type (specified in the RTP payload type RFC 3550)
 // https://en.wikipedia.org/wiki/RTP_payload_formats
 func (decoder *FFMPEGDecoder) ConsumesPayloadType(plt int) bool {
-	return plt == 4
+	return plt == G729RTPPayloadType
 }
 
 // Decode will decode all of the input packets
