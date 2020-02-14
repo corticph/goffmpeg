@@ -9,13 +9,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-var (
-	codecs = map[string]goffmpeg.Codec{
-		"G729": goffmpeg.G729,
-		"G723": goffmpeg.G723,
-	}
-)
-
 // This small sample will decode a g723.1 audio file and output a raw PCM
 // audio file. This file can be played with the following ffmpeg command:
 // ffplay -f s16le -ar 8k -ac 1 outfile.wav
@@ -55,7 +48,7 @@ func bindViperFlags() {
 
 func getDecoder(codec string) goffmpeg.Decoder {
 
-	d, err := goffmpeg.NewFFMPEGDecoder(codecs[codec])
+	d, err := goffmpeg.NewFFMPEGDecoder(codec)
 	if err != nil {
 		panic(err)
 	}

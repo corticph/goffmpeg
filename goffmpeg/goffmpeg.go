@@ -22,6 +22,13 @@ var (
 	G723 Codec = C.AV_CODEC_ID_G723_1
 )
 
+var (
+	codecs = map[string]Codec{
+		"G729": G729,
+		"G723": G723,
+	}
+)
+
 const G729RTPPayloadType = 18
 
 // Decoder is an interface borrowed from the `cart` project
@@ -43,7 +50,8 @@ type FFMPEGDecoder struct {
 }
 
 // New will return a new g723.1 decoder
-func NewFFMPEGDecoder(codecType Codec) (interface{}, error) {
+func NewFFMPEGDecoder(codecName string) (interface{}, error) {
+	codecType := codecs[codecName]
 	pkt := C.av_packet_alloc()
 	codec := getCodec(codecType)
 	parser := getParser(C.int(codec.id))

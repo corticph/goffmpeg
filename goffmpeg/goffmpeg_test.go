@@ -18,14 +18,14 @@ const (
 )
 
 func TestDecodeG729(t *testing.T) {
-	assertDecode(t, G729, G729InFilePath, G729OutFilePath)
+	assertDecode(t, "G729", G729InFilePath, G729OutFilePath)
 }
 
 func TestDecodeG723(t *testing.T) {
-	assertDecode(t, G723, G723InFilePath, G723OutFilePath)
+	assertDecode(t, "G723", G723InFilePath, G723OutFilePath)
 }
 
-func assertDecode(t *testing.T, codec Codec, inputFile, expectedFilePath string) {
+func assertDecode(t *testing.T, codec string, inputFile, expectedFilePath string) {
 
 	t.Helper()
 
@@ -73,7 +73,7 @@ func createTmpDir(t *testing.T, prefix string) string {
 
 }
 
-func getDecoder(t *testing.T, codec Codec) Decoder {
+func getDecoder(t *testing.T, codec string) Decoder {
 
 	t.Helper()
 
