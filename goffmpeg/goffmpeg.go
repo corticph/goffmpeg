@@ -40,7 +40,8 @@ type Decoder interface {
 
 var _ Decoder = &FFMPEGDecoder{}
 
-// FFMPEGDecoder is a struct for decoding g723.1 packets
+// FFMPEGDecoder is a struct used for decoding audio in various
+// ffmpeg supported protocols
 type FFMPEGDecoder struct {
 	pkt          *C.struct_AVPacket
 	codec        *C.struct_AVCodec
