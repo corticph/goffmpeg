@@ -11,10 +11,7 @@
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
-goffmpeg/cffmpeg*
-goffmpeg/libavcodec*
-goffmpeg/libavutil*
-goffmpeg/.vscode
-goffmpeg/.DS_Store
-.vscode/
+cffmpeg*
+libavcodec*
+libavutil*
 .DS_Store
