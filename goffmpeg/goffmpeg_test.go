@@ -2,6 +2,7 @@ package goffmpeg
 
 import (
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"

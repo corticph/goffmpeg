@@ -43,6 +43,7 @@ var _ Decoder = &FFMPEGDecoder{}
 // FFMPEGDecoder is a struct used for decoding audio in various
 // ffmpeg supported protocols
 type FFMPEGDecoder struct {
+	freed        bool
 	pkt          *C.struct_AVPacket
 	codec        *C.struct_AVCodec
 	parser       *C.struct_AVCodecParserContext
@@ -50,21 +51,18 @@ type FFMPEGDecoder struct {
 	decodedFrame *C.struct_AVFrame
 }
 
-// New will return a new g723.1 decoder
+// NewFFMPEGDecoder will return a new FFMPEGDecoder
 func NewFFMPEGDecoder(codecName string) (interface{}, error) {
+
 	codecType := codecs[codecName]
-	pkt := C.av_packet_alloc()
-	codec := getCodec(codecType)
-	parser := getParser(C.int(codec.id))
-	context := getContext(codec)
-	decodedFrame := C.av_frame_alloc()
 
 	return &FFMPEGDecoder{
-		pkt:          pkt,
-		codec:        codec,
-		parser:       parser,
-		context:      context,
-		decodedFrame: decodedFrame,
+		freed:        false,
+		pkt:          C.av_packet_alloc(),
+		codec:        getCodec(codecType),
+		parser:       getParser(C.int(codec.id)),
+		context:      getContext(codec),
+		decodedFrame: C.av_frame_alloc,
 	}, nil
 }
 
@@ -173,7 +171,14 @@ func appendToBuffer(data *C.uchar, buf *bytes.Buffer, size C.int) {
 
 // Destroy will free all of the memory allocated by the decoder
 func (decoder *FFMPEGDecoder) Destroy() {
-	C.avcodec_free_context(&decoder.context)
+	if !decoder.freed {
+		decoder.destroy()
+		decoder.freed = true
+	}
+}
+
+func (decoder *FFMPEGDecoder) destroy() {
 	C.av_parser_close(decoder.parser)
+	C.avcodec_free_context(&decoder.context)
 	C.av_packet_free(&decoder.pkt)
 }
