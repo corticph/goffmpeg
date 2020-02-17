@@ -1,7 +1,7 @@
 package main
 
-import (
-	"github/corticph/g72x/goffmpeg"
-)
+import "github/corticph/g72x/goffmpeg"
 
-var NewFFMPEGDecoder = goffmpeg.NewFFMPEGDecoder
+func NewFFMPEGDecoder(codecName string) (interface{}, error) {
+	return goffmpeg.NewFFMPEGDecoder(codecName)
+}
