@@ -55,14 +55,15 @@ type FFMPEGDecoder struct {
 func NewFFMPEGDecoder(codecName string) (interface{}, error) {
 
 	codecType := codecs[codecName]
+	codec := getCodec(codecType)
 
 	return &FFMPEGDecoder{
 		freed:        false,
 		pkt:          C.av_packet_alloc(),
-		codec:        getCodec(codecType),
+		codec:        codec,
 		parser:       getParser(C.int(codec.id)),
 		context:      getContext(codec),
-		decodedFrame: C.av_frame_alloc,
+		decodedFrame: C.av_frame_alloc(),
 	}, nil
 }
 
