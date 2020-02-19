@@ -10,6 +10,7 @@ package goffmpeg
 import "C"
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"log"
 	"unsafe"
@@ -18,8 +19,9 @@ import (
 type Codec C.enum_AVCodecID
 
 var (
-	G729 Codec = C.AV_CODEC_ID_G729
-	G723 Codec = C.AV_CODEC_ID_G723_1
+	G729                  Codec = C.AV_CODEC_ID_G729
+	G723                  Codec = C.AV_CODEC_ID_G723_1
+	DecoderDestroyedError       = errors.New("Cannot decode frame after destroy has been called")
 )
 
 var (
@@ -116,6 +118,10 @@ func (decoder *FFMPEGDecoder) ConsumesPayloadType(plt int) bool {
 
 // Decode will decode all of the input packets
 func (decoder *FFMPEGDecoder) Decode(input []byte) ([]byte, error) {
+
+	if decoder.freed {
+		return []byte(""), DecoderDestroyedError
+	}
 
 	firstIndex := 0
 	lastIndex := len(input) - 1
