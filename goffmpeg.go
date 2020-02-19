@@ -37,7 +37,7 @@ const G729RTPPayloadType = 18
 type Decoder interface {
 	Decode([]byte) ([]byte, error)
 	Destroy()
-	ConsumesPayloadType(int) bool
+	GetRTPPayloadType() int
 }
 
 var _ Decoder = &FFMPEGDecoder{}
@@ -109,11 +109,11 @@ func openContext(context *C.struct_AVCodecContext, codec *C.struct_AVCodec) {
 	}
 }
 
-// ConsumesPayloadType will return whether or not the given decoder
-// consumes the payload type (specified in the RTP payload type RFC 3550)
+// GetRTPPayloadType will return the given decoder payload type
+// specified in the RTP payload type RFC 3550)
 // https://en.wikipedia.org/wiki/RTP_payload_formats
-func (decoder *FFMPEGDecoder) ConsumesPayloadType(plt int) bool {
-	return plt == G729RTPPayloadType
+func (decoder *FFMPEGDecoder) GetRTPPayloadType() int {
+	return G729RTPPayloadType
 }
 
 // Decode will decode all of the input packets

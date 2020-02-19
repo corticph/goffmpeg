@@ -5,7 +5,7 @@ import "plugin"
 type Decoder interface {
 	Decode([]byte) ([]byte, error)
 	Destroy()
-	ConsumesPayloadType(int) bool
+	GetRTPPayloadType() int
 }
 
 func loadPlugin(path string) Decoder {
