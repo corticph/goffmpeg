@@ -16,12 +16,26 @@ import (
 	"unsafe"
 )
 
-type Codec C.enum_AVCodecID
+const G729RTPPayloadType = 18
+const G723RTPPayloadType = 4
+
+type Codec struct {
+	codecID        C.enum_AVCodecID
+	rtpPayloadType int
+}
 
 var (
-	G729                  Codec = C.AV_CODEC_ID_G729
-	G723                  Codec = C.AV_CODEC_ID_G723_1
-	DecoderDestroyedError       = errors.New("Cannot decode frame after destroy has been called")
+	G729 = Codec{
+		codecID:        C.AV_CODEC_ID_G729,
+		rtpPayloadType: G729RTPPayloadType,
+	}
+
+	G723 = Codec{
+		codecID:        C.AV_CODEC_ID_G723_1,
+		rtpPayloadType: G723RTPPayloadType,
+	}
+
+	DecoderDestroyedError = errors.New("Cannot decode frame after destroy has been called")
 )
 
 var (
@@ -30,8 +44,6 @@ var (
 		"G723": G723,
 	}
 )
-
-const G729RTPPayloadType = 18
 
 // Decoder is an interface borrowed from the `cart` project
 type Decoder interface {
@@ -46,6 +58,7 @@ var _ Decoder = &FFMPEGDecoder{}
 // ffmpeg supported protocols
 type FFMPEGDecoder struct {
 	freed        bool
+	payloadType  int
 	pkt          *C.struct_AVPacket
 	codec        *C.struct_AVCodec
 	parser       *C.struct_AVCodecParserContext
@@ -56,20 +69,21 @@ type FFMPEGDecoder struct {
 // NewFFMPEGDecoder will return a new FFMPEGDecoder
 func NewFFMPEGDecoder(codecName string) (interface{}, error) {
 
-	codecType := codecs[codecName]
-	codec := getCodec(codecType)
+	codec := codecs[codecName]
+	ffmpegCodec := getCodec(codec.codecID)
 
 	return &FFMPEGDecoder{
 		freed:        false,
+		payloadType:  codec.rtpPayloadType,
 		pkt:          C.av_packet_alloc(),
-		codec:        codec,
-		parser:       getParser(C.int(codec.id)),
-		context:      getContext(codec),
+		codec:        ffmpegCodec,
+		parser:       getParser(C.int(ffmpegCodec.id)),
+		context:      getContext(ffmpegCodec),
 		decodedFrame: C.av_frame_alloc(),
 	}, nil
 }
 
-func getCodec(codecType Codec) *C.struct_AVCodec {
+func getCodec(codecType C.enum_AVCodecID) *C.struct_AVCodec {
 
 	c := C.avcodec_find_decoder(uint32(codecType))
 	if c == nil {
@@ -113,7 +127,7 @@ func openContext(context *C.struct_AVCodecContext, codec *C.struct_AVCodec) {
 // specified in the RTP payload type RFC 3550)
 // https://en.wikipedia.org/wiki/RTP_payload_formats
 func (decoder *FFMPEGDecoder) GetRTPPayloadType() int {
-	return G729RTPPayloadType
+	return decoder.payloadType
 }
 
 // Decode will decode all of the input packets
