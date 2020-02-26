@@ -19,6 +19,7 @@ import (
 const G729RTPPayloadType = 18
 const G723RTPPayloadType = 4
 
+// Codec wraps some properties of a given codec
 type Codec struct {
 	codecID        C.enum_AVCodecID
 	rtpPayloadType int
@@ -162,7 +163,6 @@ func (decoder *FFMPEGDecoder) Decode(input []byte) ([]byte, error) {
 		}
 
 		if isDecodeError(bytesProcessed) {
-			C.free(unsafe.Pointer(result))
 			return []byte(""), fmt.Errorf("error while decoding frame in byte number %d (0 indexed)", firstIndex)
 
 		}
