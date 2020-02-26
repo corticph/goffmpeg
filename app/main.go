@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github/corticph/g72x/goffmpeg"
+	"github.com/corticph/goffmpeg"
 	"io/ioutil"
 
 	"github.com/spf13/pflag"
