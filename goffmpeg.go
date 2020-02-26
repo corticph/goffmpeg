@@ -135,7 +135,7 @@ func (decoder *FFMPEGDecoder) GetRTPPayloadType() int {
 func (decoder *FFMPEGDecoder) Decode(input []byte) ([]byte, error) {
 
 	if decoder.freed {
-		return []byte(""), DecoderDestroyedError
+		return nil, DecoderDestroyedError
 	}
 
 	firstIndex := 0
