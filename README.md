@@ -13,7 +13,7 @@ cd /go/src/github.com/corticph/goffmpeg/plugin
 make
 ```
 
-The environment variable `LD_LIBRARY_PATH` is essential for compilation and finding the necessary `.so:<n>` files.
+The environment variable `LD_LIBRARY_PATH` is essential for compilation and finding the necessary `.so:<n>` files. The needed libraries can be found under releases inside the `dependencies.zip` file. Extract it on the root of the repo before compiling
 
 ## Usage
 
